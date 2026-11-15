@@ -6,6 +6,7 @@ Usage: python build.py            -> writes public/index.html
 import html
 import json
 import re
+import shutil
 import sys
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -163,6 +164,8 @@ def main():
     page = TEMPLATE.replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False).replace("</", "<\\/"))
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(page, encoding="utf-8")
+    for f in (ROOT / "static").glob("*"):
+        shutil.copy(f, OUT.parent / f.name)
     total = sum(len(s["items"]) for s in sections)
     print(f"Wrote {OUT} with {total} stories in {len(sections)} sections; {len(errors)} feed errors")
     for e in errors:
