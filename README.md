@@ -11,7 +11,7 @@ Note: GitHub pauses scheduled workflows in a repo with no activity for 60 days. 
 
 ## Daily email
 
-`send_email.py` emails the brief to you after the 6 am run (and after manual "Run workflow" runs). It uses Gmail with no AI. To turn it on, add two secrets under Settings → Secrets and variables → Actions:
+`send_email.py` emails the brief to you after the 6 am run (and after manual "Run workflow" runs), with a private Inbox section listing the last 24 hours of mail in your inbox (read-only, IMAP). The inbox list is only in the email, never on the public page. No AI. To turn it on, add two secrets under Settings → Secrets and variables → Actions:
 
 - `GMAIL_ADDRESS`: your Gmail address
 - `GMAIL_APP_PASSWORD`: a Google App Password (needs 2-Step Verification). Never use your normal password.
