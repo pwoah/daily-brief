@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Single dark theme: terminal-style broadsheet. Header, section chips, then each section's headlines. */
+:root{
+  --bg:#14120f; --panel:#1c1915; --line:#2e2a24;
+  --ink:#ddd3c2; --muted:#8c8274;
+  --brass:#c09a5b; --oxblood:#b05a4f; --moss:#8a9a62; --slate:#7d93a6; --plum:#a3829e;
+  --display:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --body:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding:28px 20px 60px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}
+h1{font:800 clamp(26px,4vw,38px)/1.1 var(--display);margin:0;letter-spacing:-.02em}
+h1 span{color:var(--brass)}
+.meta{color:var(--muted);font-size:13px}
+.meta b{color:var(--ink);font-weight:500}
+.stale{color:var(--oxblood)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}
+.chip{all:unset;cursor:pointer;font:500 12px/1 var(--display);padding:8px 12px;border:1px solid var(--line);border-radius:2px;color:var(--muted)}
+.chip:hover{color:var(--ink);border-color:var(--muted)}
+.chip[aria-pressed="true"]{color:var(--bg);background:var(--c,var(--brass));border-color:var(--c,var(--brass))}
+.chip:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.sec{margin:0 0 34px}
+.sec h2{font:600 12px/1 var(--display);text-transform:uppercase;letter-spacing:.14em;margin:0 0 14px;display:flex;align-items:center;gap:10px;color:var(--c)}
+.sec h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.items{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.item{border-left:2px solid var(--c);padding:2px 0 2px 14px;max-width:72ch}
+.item h3{font:600 15px/1.4 var(--display);margin:0 0 4px;text-wrap:balance}
+.item h3 a{text-decoration:none}
+.item h3 a:hover{text-decoration:underline;text-decoration-color:var(--c)}
+.item p{margin:0 0 4px;opacity:.82;font-size:14px}
+.src{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+footer{border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px}
+noscript p{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Daily<span>_</span>Brief</h1>
+    <div class="meta" id="meta"></div>
+  </header>
+  <div id="main"><noscript><p>This page needs JavaScript to show the headlines.</p></noscript></div>
+  <footer id="foot">Headlines come straight from each outlet's public RSS feed and link to the full story. Rebuilt every morning at 6 am Pacific by a GitHub Action.</footer>
+</div>
+<script>
+const DATA=/*__DATA__*/null;
+const COLORS={"World":"var(--oxblood)","B.C. & Vancouver":"var(--moss)","Canada":"var(--brass)","Tech & AI":"var(--slate)","Science":"var(--plum)"};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl=u=>{try{const x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:"#"}catch{return "#"}};
+let filter="All";
+try{filter=localStorage.getItem("brief-filter")||"All"}catch{}
+function render(){
+  const secs=DATA.sections;
+  const total=secs.reduce((n,s)=>n+s.items.length,0);
+  const ageH=(Date.now()-Date.parse(DATA.builtIso))/36e5;
+  $("#meta").innerHTML=`<b>${esc(DATA.built)}</b> · ${total} stories`+(ageH>30?` · <span class="stale">not updated in ${Math.floor(ageH/24)||1} day(s)</span>`:"");
+  const names=["All",...secs.map(s=>s.name)];
+  if(!names.includes(filter)) filter="All";
+  const chips=`<div class="chips" role="group" aria-label="Filter by section">${names.map(n=>`<button type="button" class="chip" style="--c:${COLORS[n]||"var(--brass)"}" aria-pressed="${n===filter}" data-f="${esc(n)}">${esc(n)}</button>`).join("")}</div>`;
+  const body=secs.filter(s=>filter==="All"||s.name===filter).map(s=>`
+    <section class="sec" style="--c:${COLORS[s.name]||"var(--brass)"}">
+      <h2>${esc(s.name)}</h2>
+      <ul class="items">${s.items.map(it=>`
+        <li class="item"><h3><a href="${esc(safeUrl(it.url))}" target="_blank" rel="noopener">${esc(it.title)}</a></h3>
+        ${it.teaser?`<p>${esc(it.teaser)}</p>`:""}<div class="src">${esc(it.source)}${it.time?" · "+esc(it.time):""}</div></li>`).join("")}</ul>
+    </section>`).join("");
+  $("#main").innerHTML=chips+body;
+}
+document.addEventListener("click",e=>{const f=e.target.closest("[data-f]");if(!f)return;filter=f.dataset.f;try{localStorage.setItem("brief-filter",filter)}catch{};render()});
+render();
+</script>
+</body>
+</html>

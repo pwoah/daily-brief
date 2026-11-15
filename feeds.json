@@ -1,0 +1,23 @@
+[
+  {"name": "B.C. & Vancouver", "feeds": [
+    {"source": "CBC British Columbia", "url": "https://www.cbc.ca/webfeed/rss/rss-canada-britishcolumbia"},
+    {"source": "Global News BC", "url": "https://globalnews.ca/bc/feed/"}
+  ]},
+  {"name": "Canada", "feeds": [
+    {"source": "CBC Canada", "url": "https://www.cbc.ca/webfeed/rss/rss-canada"},
+    {"source": "Global News Canada", "url": "https://globalnews.ca/canada/feed/"}
+  ]},
+  {"name": "World", "feeds": [
+    {"source": "BBC World", "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
+    {"source": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml"},
+    {"source": "CBC World", "url": "https://www.cbc.ca/webfeed/rss/rss-world"}
+  ]},
+  {"name": "Tech & AI", "feeds": [
+    {"source": "Ars Technica", "url": "https://feeds.arstechnica.com/arstechnica/index"},
+    {"source": "The Verge", "url": "https://www.theverge.com/rss/index.xml"}
+  ]},
+  {"name": "Science", "feeds": [
+    {"source": "ScienceDaily", "url": "https://www.sciencedaily.com/rss/top/science.xml"},
+    {"source": "Phys.org", "url": "https://phys.org/rss-feed/"}
+  ]}
+]
