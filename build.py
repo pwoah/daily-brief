@@ -22,7 +22,7 @@ OUT = ROOT / "public" / "index.html"
 
 TZ = ZoneInfo("America/Vancouver")
 MAX_AGE = timedelta(hours=36)   # only stories from roughly the last day and a half
-PER_SECTION = 8
+PER_SECTION = 9
 UA = "Mozilla/5.0 (DailyBrief RSS builder; +https://github.com)"
 
 ATOM = "{http://www.w3.org/2005/Atom}"
@@ -76,13 +76,20 @@ def parse_feed(raw, source):
                 "date": parse_date(e.findtext(ATOM + "updated") or e.findtext(ATOM + "published")),
                 "source": source,
             })
-    else:
-        for e in root.iter("item"):
+    else:  # RSS 2.0 and RSS 1.0/RDF: match child tags by local name, ignoring namespaces
+        def kid(e, *names):
+            for c in e:
+                if c.tag.rsplit("}", 1)[-1] in names and (c.text or "").strip():
+                    return c.text
+            return ""
+        for e in root.iter():
+            if e.tag.rsplit("}", 1)[-1] != "item":
+                continue
             items.append({
-                "title": clean(e.findtext("title"), 160),
-                "url": (e.findtext("link") or "").strip(),
-                "teaser": clean(e.findtext("description")),
-                "date": parse_date(e.findtext("pubDate") or e.findtext(MEDIA_DC + "date")),
+                "title": clean(kid(e, "title"), 160),
+                "url": kid(e, "link").strip(),
+                "teaser": clean(kid(e, "description")),
+                "date": parse_date(kid(e, "pubDate", "date")),
                 "source": source,
             })
     return [i for i in items if i["title"] and i["url"].startswith("http")]
@@ -90,7 +97,10 @@ def parse_feed(raw, source):
 
 def load(feed):
     try:
-        return feed, parse_feed(fetch(feed["url"]), feed["source"]), None
+        items = parse_feed(fetch(feed["url"]), feed["source"])
+        for i in items:
+            i["paywall"] = feed.get("paywall", False)
+        return feed, items, None
     except Exception as exc:  # one broken feed must never break the page
         return feed, [], f"{feed['source']}: {exc.__class__.__name__}"
 
@@ -115,9 +125,17 @@ def main():
     for s in FEEDS:
         fresh = [i for i in by_section[s["name"]] if i["date"] and now - i["date"] <= MAX_AGE]
         pool_ = fresh or by_section[s["name"]]  # fall back to the newest available if a feed has no dates
-        pool_.sort(key=lambda i: i["date"] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+        oldest = datetime.min.replace(tzinfo=timezone.utc)
+        by_src = {}
+        for i in sorted(pool_, key=lambda i: i["date"] or oldest, reverse=True):
+            by_src.setdefault(i["source"], []).append(i)
+        mixed = []
+        while any(by_src.values()):
+            for q in by_src.values():
+                if q:
+                    mixed.append(q.pop(0))
         picked = []
-        for i in pool_:
+        for i in mixed:
             k = norm(i["title"])
             if k in seen:
                 continue
@@ -125,9 +143,14 @@ def main():
             picked.append({
                 "title": i["title"], "url": i["url"], "teaser": i["teaser"], "source": i["source"],
                 "time": i["date"].astimezone(TZ).strftime("%b %-d, %-I:%M %p") if i["date"] else "",
+                "paywall": bool(i.get("paywall")),
+                "_d": (i["date"] or oldest).timestamp(),
             })
             if len(picked) >= PER_SECTION:
                 break
+        picked.sort(key=lambda x: x["_d"], reverse=True)
+        for x in picked:
+            del x["_d"]
         if picked:
             sections.append({"name": s["name"], "items": picked})
 

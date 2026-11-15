@@ -1,75 +1,44 @@
 [
-  {
-    "name": "B.C. & Vancouver",
-    "feeds": [
-      {
-        "source": "Global News BC",
-        "url": "https://globalnews.ca/bc/feed/"
-      },
-      {
-        "source": "Vancouver Sun",
-        "url": "https://vancouversun.com/feed"
-      },
-      {
-        "source": "CityNews Vancouver",
-        "url": "https://vancouver.citynews.ca/feed/"
-      },
-      {
-        "source": "The Tyee",
-        "url": "https://thetyee.ca/rss2.xml"
-      }
-    ]
-  },
-  {
-    "name": "Canada",
-    "feeds": [
-      {
-        "source": "Global News Canada",
-        "url": "https://globalnews.ca/canada/feed/"
-      }
-    ]
-  },
-  {
-    "name": "World",
-    "feeds": [
-      {
-        "source": "BBC World",
-        "url": "https://feeds.bbci.co.uk/news/world/rss.xml"
-      },
-      {
-        "source": "Al Jazeera",
-        "url": "https://www.aljazeera.com/xml/rss/all.xml"
-      },
-      {
-        "source": "The Guardian World",
-        "url": "https://www.theguardian.com/world/rss"
-      }
-    ]
-  },
-  {
-    "name": "Tech & AI",
-    "feeds": [
-      {
-        "source": "Ars Technica",
-        "url": "https://feeds.arstechnica.com/arstechnica/index"
-      },
-      {
-        "source": "The Verge",
-        "url": "https://www.theverge.com/rss/index.xml"
-      }
-    ]
-  },
-  {
-    "name": "Science",
-    "feeds": [
-      {
-        "source": "ScienceDaily",
-        "url": "https://www.sciencedaily.com/rss/top/science.xml"
-      },
-      {
-        "source": "Phys.org",
-        "url": "https://phys.org/rss-feed/"
-      }
-    ]
-  }
+  {"name": "World", "feeds": [
+    {"source": "BBC World", "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
+    {"source": "The Guardian World", "url": "https://www.theguardian.com/world/rss"},
+    {"source": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml"},
+    {"source": "France 24", "url": "https://www.france24.com/en/rss"},
+    {"source": "DW", "url": "https://rss.dw.com/rdf/rss-en-all"},
+    {"source": "NPR World", "url": "https://feeds.npr.org/1004/rss.xml"},
+    {"source": "FT World", "url": "https://www.ft.com/world?format=rss", "paywall": true}
+  ]},
+  {"name": "Politics", "feeds": [
+    {"source": "Global News Politics", "url": "https://globalnews.ca/politics/feed/"},
+    {"source": "NPR Politics", "url": "https://feeds.npr.org/1014/rss.xml"},
+    {"source": "Politico", "url": "https://rss.politico.com/politics-news.xml"},
+    {"source": "BBC UK Politics", "url": "https://feeds.bbci.co.uk/news/politics/rss.xml"},
+    {"source": "Politico Europe", "url": "https://www.politico.eu/feed/"}
+  ]},
+  {"name": "Economy & Markets", "feeds": [
+    {"source": "BBC Business", "url": "https://feeds.bbci.co.uk/news/business/rss.xml"},
+    {"source": "The Guardian Business", "url": "https://www.theguardian.com/business/rss"},
+    {"source": "CNBC Economy", "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html"},
+    {"source": "NPR Economy", "url": "https://feeds.npr.org/1017/rss.xml"},
+    {"source": "Global News Money", "url": "https://globalnews.ca/money/feed/"},
+    {"source": "FT Global Economy", "url": "https://www.ft.com/global-economy?format=rss", "paywall": true}
+  ]},
+  {"name": "B.C. & Vancouver", "feeds": [
+    {"source": "Global News BC", "url": "https://globalnews.ca/bc/feed/"},
+    {"source": "Vancouver Sun", "url": "https://vancouversun.com/feed"},
+    {"source": "CityNews Vancouver", "url": "https://vancouver.citynews.ca/feed/"},
+    {"source": "The Tyee", "url": "https://thetyee.ca/rss2.xml"}
+  ]},
+  {"name": "Canada", "feeds": [
+    {"source": "Global News Canada", "url": "https://globalnews.ca/canada/feed/"},
+    {"source": "The Guardian Canada", "url": "https://www.theguardian.com/world/canada/rss"}
+  ]},
+  {"name": "Tech & AI", "feeds": [
+    {"source": "Ars Technica", "url": "https://feeds.arstechnica.com/arstechnica/index"},
+    {"source": "The Verge", "url": "https://www.theverge.com/rss/index.xml"}
+  ]},
+  {"name": "Science", "feeds": [
+    {"source": "ScienceDaily", "url": "https://www.sciencedaily.com/rss/top/science.xml"},
+    {"source": "Phys.org", "url": "https://phys.org/rss-feed/"}
+  ]}
 ]
