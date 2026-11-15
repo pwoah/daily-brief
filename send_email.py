@@ -10,7 +10,9 @@ import html
 import json
 import os
 import smtplib
+import re
 import ssl
+import sys
 from email.message import EmailMessage
 from pathlib import Path
 
@@ -52,8 +54,9 @@ def plain(data):
 
 
 def main():
-    address = os.environ.get("GMAIL_ADDRESS", "").strip()
-    password = os.environ.get("GMAIL_APP_PASSWORD", "").replace(" ", "")
+    # strip every kind of space (Google shows the app password in groups, sometimes with non-breaking spaces) and stray quotes
+    address = re.sub(r"\s", "", os.environ.get("GMAIL_ADDRESS", "")).strip("\"'")
+    password = re.sub(r"\s", "", os.environ.get("GMAIL_APP_PASSWORD", "")).strip("\"'")
     if not address or not password:
         print("GMAIL_ADDRESS or GMAIL_APP_PASSWORD secret not set; skipping email.")
         return
@@ -64,10 +67,27 @@ def main():
     msg["To"] = address
     msg.set_content(plain(data))
     msg.add_alternative(render(data), subtype="html")
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as smtp:
-        smtp.login(address, password)
-        smtp.send_message(msg)
-    print(f"Emailed the brief to {address[:3]}…")
+    if len(password) != 16 or not password.isascii():
+        print(f"Note: the app password secret is {len(password)} characters after removing spaces; a Google App Password is 16 letters.")
+    last = None
+    for attempt in ("ssl", "starttls"):
+        try:
+            if attempt == "ssl":
+                smtp = smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context(), timeout=30)
+            else:
+                smtp = smtplib.SMTP("smtp.gmail.com", 587, timeout=30)
+                smtp.starttls(context=ssl.create_default_context())
+            with smtp:
+                smtp.login(address, password)
+                smtp.send_message(msg)
+            print(f"Emailed the brief ({attempt}).")
+            return
+        except smtplib.SMTPAuthenticationError as exc:
+            sys.exit(f"Gmail rejected the login: {exc.smtp_code}. Check that GMAIL_ADDRESS is your full Gmail address and GMAIL_APP_PASSWORD is a fresh App Password.")
+        except Exception as exc:
+            last = exc
+            print(f"{attempt} attempt failed: {exc.__class__.__name__}: {exc}")
+    sys.exit(f"Could not send the email: {last}")
 
 
 if __name__ == "__main__":

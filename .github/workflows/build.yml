@@ -27,6 +27,7 @@ jobs:
       - run: python build.py
       - name: Email the brief (6 am run and manual runs only)
         if: github.event_name != 'push'
+        continue-on-error: true   # a mail problem must never stop the page from publishing
         run: python send_email.py
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
