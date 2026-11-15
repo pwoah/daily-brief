@@ -25,6 +25,12 @@ jobs:
         with:
           python-version: "3.12"
       - run: python build.py
+      - name: Email the brief (6 am run and manual runs only)
+        if: github.event_name != 'push'
+        run: python send_email.py
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public

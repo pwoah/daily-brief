@@ -163,6 +163,7 @@ def main():
     }
     page = TEMPLATE.replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False).replace("</", "<\\/"))
     OUT.parent.mkdir(exist_ok=True)
+    (ROOT / "brief.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")  # for send_email.py
     OUT.write_text(page, encoding="utf-8")
     for f in (ROOT / "static").glob("*"):
         shutil.copy(f, OUT.parent / f.name)
