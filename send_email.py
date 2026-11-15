@@ -67,8 +67,9 @@ def main():
     msg["To"] = address
     msg.set_content(plain(data))
     msg.add_alternative(render(data), subtype="html")
-    if len(password) != 16 or not password.isascii():
-        print(f"Note: the app password secret is {len(password)} characters after removing spaces; a Google App Password is 16 letters.")
+    # safe diagnostics: shapes only, never the values
+    print(f"address: {len(address)} chars, ends with @gmail.com: {address.lower().endswith('@gmail.com')}, ascii: {address.isascii()}")
+    print(f"app password: {len(password)} chars, letters only: {password.isalpha()}, all lowercase: {password.islower()}, ascii: {password.isascii()}")
     last = None
     for attempt in ("ssl", "starttls"):
         try:
@@ -78,7 +79,16 @@ def main():
                 smtp = smtplib.SMTP("smtp.gmail.com", 587, timeout=30)
                 smtp.starttls(context=ssl.create_default_context())
             with smtp:
-                smtp.login(address, password)
+                smtp.ehlo()
+                print("server offers:", smtp.esmtp_features.get("auth", "?"))
+                code, resp = smtp.docmd("AUTH", "LOGIN")
+                print("AUTH LOGIN ->", code)
+                code, resp = smtp.docmd(smtplib.base64.b64encode(address.encode()).decode())
+                print("username step ->", code)
+                code, resp = smtp.docmd(smtplib.base64.b64encode(password.encode()).decode())
+                print("password step ->", code, resp.decode(errors="replace")[:120])
+                if code != 235:
+                    raise smtplib.SMTPAuthenticationError(code, resp)
                 smtp.send_message(msg)
             print(f"Emailed the brief ({attempt}).")
             return
